@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible"  content="ie=edge"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-database.js"></script>
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+        https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script>
+
+
+  <style>
+    #issMap { height: 500px; weidth: 250px; }
+
+    </style>
+
+        <title> Geolocalitation</title>
+    </head>
+    <body>
+
+      <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+          apiKey: "AIzaSyCHhqzvxMGPbLjg6r3gZPcJft1H59rCVcM",
+          authDomain: "modified-media-273722.firebaseapp.com",
+          databaseURL: "https://modified-media-273722.firebaseio.com",
+          projectId: "modified-media-273722",
+          storageBucket: "modified-media-273722.appspot.com",
+          messagingSenderId: "431053434380",
+          appId: "1:431053434380:web:a7847a12a5b61d567bc829",
+          measurementId: "G-40XV3MBC0E"
+
+        };
+        </script>
+        <h2>Enter the name of the route to get its information</h2>
+        <input list="rutas" id="ruta" required=requiered/></label><br>
+        <datalist id="rutas">
+        <option value="ruta1Directo">
+        <option value="ruta1Central">
+        </datalist>
+        <button type="button" name="button" onclick="getData(busmarker);">Get</button>
+          <p>altitud: <strong id="altitud"></strong></p>
+          <p>longitud: <strong id="longitud"></strong></p>
+          <p>capacidad: <strong id="capacidad"></strong></p>
+        <script>
+  // Initialize Firebase
+
+        firebase.initializeApp(firebaseConfig);
+      /*  var database = firebase.database();
+        var ref = database.ref('rutas/ruta1Directo');
+
+        var data = {
+          altitud: 105,
+          longitud: 55,
+          capacidad: "alta"
+        }
+        ref.push(data);
+
+        ref.on('value', gotData, errData);
+
+        function gotData(data){
+          console.log(data.val());
+        }
+        function errData(err){
+          console.log('Error!');
+          console.log(err);
+        }*/
+        const issIcone = L.icon({
+          iconUrl: 'Bus.png',
+          iconSize: [50, 32],
+          iconAnchor: [25, 16],
+});
+
+      </script>
+
+
+      <h1> Where am I</h1>
+      <p>latitude: <span id="lat"></span>°<br />
+      longitude: <span id="long"></span>°
+      </p>
+
+        <div id="issMap"></div>
+        <script>
+          //map and Title
+          const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributos';
+          const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          const tiles = L.tileLayer(tileUrl,{attribution});
+
+          const mymap = L.map('issMap').setView([0, 0], 1);
+
+          tiles.addTo(mymap);
+
+          //Marker with icon
+
+          const issIcon = L.icon({
+            iconUrl: 'Ubi.png',
+            iconSize: [35, 16],
+            iconAnchor: [15, 8],
+          });
+
+        const busmarker = L.marker([0, 0], { icon: issIcone}).addTo(mymap);
+        function getData(busmaker){
+          var ruta=document.getElementById("ruta").value;
+          var database = firebase.database();
+          var ref = database.ref('rutas/'+ruta);
+          ref.on('value', function(datos){
+            var info = datos.val();
+            var keys = Object.keys(info);
+            k=keys[keys.length-1];
+            var altitud = info[k].altitud;
+            var longitud = info[k].longitud;
+            var capacidad = info[k].capacidad;
+
+            document.getElementById('altitud').textContent = altitud;
+            document.getElementById('longitud').textContent = longitud;
+            document.getElementById('capacidad').textContent = capacidad;
+            busmarker.setLatLng([altitud, longitud]);
+            const txt='Capacidad: '+capacidad;
+            busmaker.bindPopup(txt);
+              })
+            }
+
+
+          let firsTime = true;
+          const marker = L.marker([0, 0], { icon: issIcon}).addTo(mymap);
+
+          async function getU() {
+              console.log("geolocation is available ");
+              navigator.geolocation.getCurrentPosition(position => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                document.getElementById('lat').textContent = latitude;
+                document.getElementById('long').textContent = longitude;
+                marker.setLatLng([latitude, longitude]);
+                if (firsTime) {
+                  mymap.setView([latitude, longitude], 12);
+                  firsTime=false;
+                }
+            });
+
+
+
+          //  L.marker([latitude, longitude]).addTo(mymap);
+
+
+          }
+          getU();
+
+        </script>
+
+    </body>
+</html>

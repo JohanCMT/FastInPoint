@@ -1,0 +1,16 @@
+{
+  "name": "fastinpoint",
+  "version": "1.0.0",
+  "description": "This is the app for AL",
+  "main": "\t",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "fast",
+    "in",
+    "point"
+  ],
+  "author": "Johan Caballero",
+  "license": "MIT"
+}
