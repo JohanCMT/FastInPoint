@@ -21,7 +21,7 @@
         <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
         <title>FastInPoint</title>
   <style>
-    #issMap { height: 500px; weidth: 250px; }
+    #issMap { height: 800px; weidth: 250px; }
 
     </style>
 
@@ -72,13 +72,15 @@
 
         };
         </script>
-        <h2>Enter the name of the route to get its information</h2>
-        <input list="rutas" id="ruta" required=requiered/></label><br>
+        <h2>Nombre de la ruta que espera</h2>
+
+        <input list="rutas" id="ruta" required=requiered/></label>
         <datalist id="rutas">
         <option value="ruta1Directo">
         <option value="ruta1Central">
         </datalist>
-        <button type="button" name="button" onclick="getData(busmarker);">Get</button>
+        <button type="button" name="button" onclick="getData(busmarker);">Buscar</button>
+        <br>
 
           <script>
            firebase.initializeApp(firebaseConfig);
@@ -229,10 +231,15 @@
             iconSize: [35, 16],
             iconAnchor: [15, 8],
           });
-
+        let firsTime2 = true;
+        let rutaTemp = "";
         const busmarker = L.marker([-90, 0], { icon: issIcone}).addTo(mymap);
         function getData(busmaker){
           var ruta=document.getElementById("ruta").value;
+          if(rutaTemp!==ruta){
+            firsTime2 = true;
+          };
+          var rutaTemp=ruta;
           var database = firebase.database();
           var ref = database.ref('rutas/'+ruta);
           ref.on('value', function(datos){
@@ -247,6 +254,11 @@
           //  document.getElementById('longitud').textContent = longitud;
           //  document.getElementById('capacidad').textContent = capacidad;
             busmarker.setLatLng([altitud, longitud]);
+
+            if (firsTime2) {
+              mymap.flyTo([altitud, longitud], 11);
+              firsTime2=false;
+            }
             const txt='Capacidad: '+capacidad;
             busmaker.bindPopup(txt);
               })
