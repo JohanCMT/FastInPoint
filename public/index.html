@@ -12,12 +12,14 @@
         crossorigin=""></script>
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-database.js"></script>
         <!-- TODO: Add SDKs for Firebase products that you want to use
         https://firebase.google.com/docs/web/setup#available-libraries -->
         <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script>
-
-
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+        <title>FastInPoint</title>
   <style>
     #issMap { height: 500px; weidth: 250px; }
 
@@ -26,6 +28,35 @@
         <title> Geolocalitation</title>
     </head>
     <body>
+      <div class="container">
+        <nav class="navbar navbar-light bg-light justify-content-between">
+          <a class="navbar-brand">FastInPoint</a>
+          <div class="form-inline">
+            <div class="custom-control custom-checkbox my-1 mr-sm-2" id="checkLogin">
+              <input type="checkbox" checked data-toggle="toggle" data-on="Registrar" data-off="Loguearse" id="loginRegistro">
+            </div>
+            <div id="areaRegistro" style="display: none;">
+            <input type="email" id="email" placeholder="Coloca aquí tu email" class="form-control mr-sm-2">
+            <input type="password" id="pass" placeholder="Coloca aquí tu password" class="form-control mr-sm-2">
+            <button type="button" onclick="enviar()" class="btn btn-outline-success my-2 my-sm-0">Registro</button>
+            </div>
+          <div id="areaLogin" style="display: none;">
+            <input type="email" id="emailA" placeholder="Coloca aquí tu email" class="form-control mr-sm-2">
+            <input type="password" id="passA" placeholder="Coloca aquí tu password" class="form-control mr-sm-2">
+            <button type="button" onclick="acceso()" id="botonAcceso" class="btn btn-outline-success my-2 my-sm-0">Acceso</button>
+            <button type="button" class="btn btn-danger" id="btnCerrar" onclick="cerrar()" style="display: none">Cerrar sesión</button>
+          </div>
+          </div>
+        </nav>
+      </div>
+
+
+
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
 
       <script>
         // Your web app's Firebase configuration
@@ -51,29 +82,126 @@
           <p>altitud: <strong id="altitud"></strong></p>
           <p>longitud: <strong id="longitud"></strong></p>
           <p>capacidad: <strong id="capacidad"></strong></p>
+
+          <script>
+           firebase.initializeApp(firebaseConfig);
+           /* var database = firebase.database();
+            var ref = database.ref('rutas/ruta1Directo');
+
+            var data = {
+              altitud: 105,
+              longitud: 55,
+              capacidad: "alta"
+            }
+            ref.push(data);
+
+            ref.on('value', gotData, errData);
+
+            function gotData(data){
+              console.log(data.val());
+            }
+            function errData(err){
+              console.log('Error!');
+              console.log(err);
+            }
+            */
+
+            firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+              var displayName = user.displayName;
+              var email = user.email;
+              var emailVerified = user.emailVerified;
+              var photoURL = user.photoURL;
+              var isAnonymous = user.isAnonymous;
+              var uid = user.uid;
+              var textoVerificado="";
+              if(emailVerified===false){
+                textoVerificado="Email no verificado";
+              }
+              else{
+                textoVerificado="Email verificado";
+              }
+              var providerData = user.providerData;
+              /*
+              document.getElementById('login').innerHTML=
+              `<p>Logueado `+user.email+` `+textoVerificado+`</p>
+              <button type="button" class="btn btn-danger" onclick="cerrar()">Cerrar sesión</button>
+              `;*/
+              document.getElementById('botonAcceso').style.display="none";
+              document.getElementById('checkLogin').style.display="none";
+              document.getElementById('areaRegistro').style.display="none";
+              document.getElementById('passA').style.display="none";
+              document.getElementById('areaLogin').style.display="";
+              document.getElementById('btnCerrar').style.display="";
+              document.getElementById('emailA').value=email;
+              console.log(user);
+            } else {
+            //  document.getElementById('login').innerHTML="No Logueado ";
+              document.getElementById('botonAcceso').style.display="";
+              document.getElementById('checkLogin').style.display="";
+              document.getElementById('areaRegistro').style.display="";
+              document.getElementById('areaLogin').style.display="none";
+              document.getElementById('passA').style.display="";
+              document.getElementById('btnCerrar').style.display="none";
+            }
+          });
+
+            function enviar(){
+            var email=document.getElementById('email').value;
+            var pass=document.getElementById('pass').value;
+            firebase.auth().createUserWithEmailAndPassword(email, pass).catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              alert(errorMessage);
+            }).then(function(){
+              verificar();
+            });
+          }
+          function verificar(){
+            var user = firebase.auth().currentUser;
+            user.sendEmailVerification().then(function (){
+
+            }).catch(function(error){
+
+            });
+          }
+          function acceso(){
+          var emailA=document.getElementById('emailA').value;
+          var passA=document.getElementById('passA').value;
+          firebase.auth().signInWithEmailAndPassword(emailA, passA).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            alert(errorMessage);
+            // ...
+          });
+         }
+         function cerrar(){
+           firebase.auth().signOut()
+           .then(function(){
+             console.log('Salir');
+           })
+           .catch(function(error){
+             console.log(error)
+           })
+         }
+         $(document).ready(function(){
+           $('#loginRegistro').change(function(){
+             if($(this).is(':checked')){
+               $('#areaLogin').hide();
+               $('#areaRegistro').show();
+             }
+             else{
+               $('#areaLogin').show();
+               $('#areaRegistro').hide();
+             }
+           });
+         });
+          </script>
+
         <script>
   // Initialize Firebase
-
-        firebase.initializeApp(firebaseConfig);
-      /*  var database = firebase.database();
-        var ref = database.ref('rutas/ruta1Directo');
-
-        var data = {
-          altitud: 105,
-          longitud: 55,
-          capacidad: "alta"
-        }
-        ref.push(data);
-
-        ref.on('value', gotData, errData);
-
-        function gotData(data){
-          console.log(data.val());
-        }
-        function errData(err){
-          console.log('Error!');
-          console.log(err);
-        }*/
         const issIcone = L.icon({
           iconUrl: 'Bus.png',
           iconSize: [50, 32],
