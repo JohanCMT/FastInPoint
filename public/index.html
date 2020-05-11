@@ -73,7 +73,7 @@
         };
         </script>
         <p class="h2">Nombre de la ruta que espera: </p>
-        <input list="rutas" id="ruta" required=requiered/></label>
+        <input list="rutas" id="ruta" class="in"required=requiered/></label>
         <datalist id="rutas">
         <option value="ruta1Directo">
         <option value="ruta1Central">
@@ -238,6 +238,7 @@
         let firsTime2 = true;
         let rutaTemp = "";
         const busmarker = L.marker([-90, 0], { icon: issIcone}).addTo(mymap);
+
         function getData(busmaker){
           var ruta=document.getElementById("ruta").value;
           if(rutaTemp!==ruta){
@@ -263,7 +264,7 @@
               mymap.flyTo([altitud, longitud], 11);
               firsTime2=false;
             }
-            const txt='Capacidad: '+capacidad;
+            const txt='<p>Ruta: '+ruta+'<br />Capacidad: '+capacidad +'</p>';
             busmaker.bindPopup(txt);
               })
             }
