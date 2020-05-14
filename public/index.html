@@ -61,15 +61,14 @@
       <script>
         // Your web app's Firebase configuration
         var firebaseConfig = {
-          apiKey: "AIzaSyCHhqzvxMGPbLjg6r3gZPcJft1H59rCVcM",
-          authDomain: "modified-media-273722.firebaseapp.com",
-          databaseURL: "https://modified-media-273722.firebaseio.com",
-          projectId: "modified-media-273722",
-          storageBucket: "modified-media-273722.appspot.com",
-          messagingSenderId: "431053434380",
-          appId: "1:431053434380:web:a7847a12a5b61d567bc829",
-          measurementId: "G-40XV3MBC0E"
-
+          apiKey: "AIzaSyCDPwcK4USjJm-WbmsNYpeLFgkAiwSCOZo",
+          authDomain: "fastinpoint-2.firebaseapp.com",
+          databaseURL: "https://fastinpoint-2.firebaseio.com",
+          projectId: "fastinpoint-2",
+          storageBucket: "fastinpoint-2.appspot.com",
+          messagingSenderId: "623847604416",
+          appId: "1:623847604416:web:4614f991a0845025edad25",
+          measurementId: "G-FBBTBYFFTH"
         };
         </script>
         <p class="h2">Nombre de la ruta que espera: </p>
@@ -261,7 +260,7 @@
             busmarker.setLatLng([altitud, longitud]);
 
             if (firsTime2) {
-              mymap.flyTo([altitud, longitud], 11);
+              mymap.flyTo([altitud, longitud], 15);
               firsTime2=false;
             }
             const txt='<p>Ruta: '+ruta+'<br />Capacidad: '+capacidad +'</p>';
@@ -282,7 +281,7 @@
                 //document.getElementById('long').textContent = longitude;
                 marker.setLatLng([latitude, longitude]);
                 if (firsTime) {
-                  mymap.setView([latitude, longitude], 12);
+                  mymap.setView([latitude, longitude], 15);
                   firsTime=false;
                 }
             });
