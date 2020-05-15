@@ -1,0 +1,23 @@
+h4{
+  background-color: green;
+  padding: 50px 20px 20px 50px;
+}
+
+h3{
+  background-color: blue;
+  padding: 400px 50px 50px 400px;
+}
+
+.but{
+  margin: 0px 0px 15px;
+}
+
+#issMap {
+  /* height: 800px; */
+  width: 100%;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+}
