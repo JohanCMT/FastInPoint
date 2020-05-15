@@ -12,5 +12,8 @@
     "point"
   ],
   "author": "Johan Caballero",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "nodemon": "^2.0.4"
+  }
 }

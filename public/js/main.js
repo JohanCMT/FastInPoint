@@ -148,9 +148,14 @@ const tiles = L.tileLayer(tileUrl, {
     attribution
 });
 
-const mymap = L.map('issMap').setView([0, 0], 1);
+const mymap = L.map('issMap', {
+  minZoom: 8,
+  maxZoom: 18
+});
 
 tiles.addTo(mymap);
+
+mymap.setView([25.749247, -100.299161], 9);
 
 //Marker with icon
 
@@ -161,14 +166,24 @@ const issIcon = L.icon({
 });
 let firsTime2 = true;
 let rutaTemp = "";
-const busmarker = L.marker([-90, 0], {
+let busmarker = L.marker([-90, 0], {
     icon: issIcone
 }).addTo(mymap);
 
-function getData(busmaker) {
+var marcador = false;
+
+function getData() {
     var ruta = document.getElementById("ruta").value;
     if (rutaTemp !== ruta) {
         firsTime2 = true;
+        if(marcador){
+          console.log("yeah bitch");
+          busmarker.remove();
+          busmarker = L.marker([-90, 0], {
+             icon: issIcone
+          }).addTo(mymap);
+        }
+        marcador = true;
     };
     var rutaTemp = ruta;
     var database = firebase.database();
@@ -180,18 +195,13 @@ function getData(busmaker) {
         var altitud = info[k].altitud;
         var longitud = info[k].longitud;
         var capacidad = info[k].capacidad;
-
-        //  document.getElementById('altitud').textContent = altitud;
-        //  document.getElementById('longitud').textContent = longitud;
-        //  document.getElementById('capacidad').textContent = capacidad;
         busmarker.setLatLng([altitud, longitud]);
-
         if (firsTime2) {
-            mymap.flyTo([altitud, longitud], 15);
-            firsTime2 = false;
-        }
+          mymap.flyTo([altitud, longitud], 15);
+          firsTime2 = false;
+        };
         const txt = '<p>Ruta: ' + ruta + '<br />Capacidad: ' + capacidad + '</p>';
-        busmaker.bindPopup(txt);
+        busmarker.bindPopup(txt);
     })
 }
 
