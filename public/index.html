@@ -51,15 +51,15 @@
   </nav>
   <main>
     <div class="content">
-      <p class="h2">Nombre de la ruta que espera: </p>
-      <input list="rutas" id="ruta" class="in" required=requiered /></label>
-      
-      <datalist id="rutas">
-        <option value="ruta1Directo">
-        <option value="ruta1Central">
-      </datalist>
-    
-      <button class="but" type="button" name="button" onclick="getData(busmarker);">Buscar</button>
+      <h3>Nombre de la ruta que espera:</h3>
+      <div class="input-cont">
+        <input list="rutas" id="ruta" class="in" required=required />
+        <datalist id="rutas">
+          <option value="ruta1Directo">
+          <option value="ruta1Central">
+        </datalist>
+        <button class="but" type="button" name="button" onclick="getData(busmarker);">Buscar</button>
+      </div>
     </div>
     <div id="issMap"></div>
   </main>
