@@ -174,10 +174,6 @@ let marcador = false;
 let database = firebase.database();
 
 
-
-
-
-
 async function iterador() {
     let arr = [];
     let ruta = document.getElementById("ruta").value;
@@ -197,32 +193,25 @@ async function iterador() {
 
     let rutaTemp = ruta;
     */
-    console.log('!!!!', ruta)
     let ref = database.ref('rutas/' + ruta);
-    console.log('call');
     let idx = 1;
     let prom = await ref.once('value');
-
     let info = prom.val();
-    console.log(info);
     let keys = Object.keys(info);
-    
+
     for(let j = 0; j< keys.length; j++){
         let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
-        
         let resp = await refe.once('value');
         let infoe = resp.val();
         let altitud = infoe.altitud;
         let longitud = infoe.longitud;
         let capacidad = infoe.capacidad;
-        arr.push(L.marker([altitud, longitud]));
         const txt = '<p>Ruta: ' + idx + '<br />Capacidad: ' + capacidad + '</p>';
         let newMarker = L.marker([altitud, longitud], {
             icon: issIcone
         }).addTo(mymap);
         newMarker.bindPopup(txt);
         arr.push(newMarker);
-
     }
 
     return arr;
@@ -235,26 +224,21 @@ let prev = [];
 async function getData()  {
     let ruta = document.getElementById("ruta").value;
     let arreglo = await iterador();
-    
+
     if (prev.length === 0 && arreglo.length !== 0) {
         mymap.setView(arreglo[0].getLatLng(), 15);
     }
-
-    console.log('eyeeyye', prev);
     for (item of prev) {
         mymap.removeLayer(item);
     }
-    console.log('ARRR:', arreglo)
     prev = [];
     for (let i = 0; i < arreglo.length; i++) {
         let mark = arreglo[i];
-        console.log('------', i);
-        console.log('------',mark);
         prev.push(mark);
     }
     setTimeout(getData, 500);
 
-    
+
     //console.log(arreglo[0]);
     /*if (rutaTemp !== ruta) {
         firsTime2 = true;
