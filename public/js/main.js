@@ -198,40 +198,61 @@ function iterador() {
     */
 
     let ref = database.ref('rutas/' + ruta);
-    ref.once('value', function (datos) {
+    console.log('call');
+    let idx = 1;
+    return ref.once('value', function (datos) {
         let info = datos.val();
+        console.log(info);
         let keys = Object.keys(info);
-        //console.log(keys);
-        for(let j = 0; j< keys.length; j++){
-          let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
-            refe.once('value', function(datose){
-            let infoe = datose.val();
-            //let keyse = Object.keys(infoe);
-            //let k = keyse[keyse.length - 1];
-            let altitud = infoe.altitud;
-            let longitud = infoe.longitud;
-            let capacidad = infoe.capacidad;
-            const txt = '<p>Ruta: ' + keys[j] + '<br />Capacidad: ' + capacidad + '</p>';
-            //arr.push(L.marker([altitud, longitud]));
-            arr.push(L.marker([altitud, longitud], {
-                icon: issIcone
-            }).addTo(mymap));
-            ;
-            arr[j].bindPopup(txt);
-          });
-        }
-    });
-    console.log(arr);
-      return arr;
+        // console.log(datos);
+        // let attrs = {};
+        // for(let j = 0; j< keys.length; j++){
+        //   let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
+        //   console.log(refe)
+        //     refe.once('value', function(datose){
+        //         // console.log(datose)
+        //     let infoe = datose.val();
+        //     console.log(infoe);
+        //     //let keyse = Object.keys(infoe);
+        //     //let k = keyse[keyse.length - 1];
+        //     attrs[keys[j]] = infoe;
+        //     // let altitud = infoe.altitud;
+        //     // let longitud = infoe.longitud;
+        //     // let capacidad = infoe.capacidad;
+        //     //arr.push(L.marker([altitud, longitud]));
+        //     });
+        // }
+        // console.log('->',attrs);
+        console.log(datos);
+        const txt = '<p>Ruta: ' + idx + '<br />Capacidad: ' + info.capacidad + '</p>';
+        let newMarker = L.marker([info.altitud, info.longitud], {
+            icon: issIcone
+        }).addTo(mymap);
+        newMarker.bindPopup(txt);
+        arr.push(newMarker);
+        idx++;
+        datos.arr = arr;
+        console.log(datos);
+    })
 
 }
 
 
 
-
-function getData() {
+let prev = [];
+async function getData()  {
     let ruta = document.getElementById("ruta").value;
-    let arreglo=iterador();
+    let arreglo = await iterador().then((resp) => resp.arr);
+    if (arreglo.length == 0) return;
+    mymap.setView(arreglo[0].getLatLng(), 15);
+    
+    if (prev !== null) {
+        for (item of prev) {
+            mymap.removeLayer(item);
+        }
+    }
+
+    prev = arreglo;
     //console.log(arreglo[0]);
     /*if (rutaTemp !== ruta) {
         firsTime2 = true;
@@ -272,7 +293,7 @@ function getData() {
       */
 }
 
-
+setInterval(getData, 1000);
 
 
 
