@@ -1,5 +1,5 @@
 // Your web app's Firebase configuration
-var firebaseConfig = {
+let firebaseConfig = {
     apiKey: "AIzaSyCDPwcK4USjJm-WbmsNYpeLFgkAiwSCOZo",
     authDomain: "fastinpoint-2.firebaseapp.com",
     databaseURL: "https://fastinpoint-2.firebaseio.com",
@@ -13,10 +13,10 @@ var firebaseConfig = {
 //--------------------------------------
 
 firebase.initializeApp(firebaseConfig);
-/* var database = firebase.database();
- var ref = database.ref('rutas/ruta1Directo');
+/* let database = firebase.database();
+ let ref = database.ref('rutas/ruta1Directo');
 
- var data = {
+ let data = {
    altitud: 105,
    longitud: 55,
    capacidad: "alta"
@@ -36,19 +36,19 @@ firebase.initializeApp(firebaseConfig);
 
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
-        var displayName = user.displayName;
-        var email = user.email;
-        var emailVerified = user.emailVerified;
-        var photoURL = user.photoURL;
-        var isAnonymous = user.isAnonymous;
-        var uid = user.uid;
-        var textoVerificado = "";
+        let displayName = user.displayName;
+        let email = user.email;
+        let emailVerified = user.emailVerified;
+        let photoURL = user.photoURL;
+        let isAnonymous = user.isAnonymous;
+        let uid = user.uid;
+        let textoVerificado = "";
         if (emailVerified === false) {
             textoVerificado = "Email no verificado";
         } else {
             textoVerificado = "Email verificado";
         }
-        var providerData = user.providerData;
+        let providerData = user.providerData;
         /*
         document.getElementById('login').innerHTML=
         `<p>Logueado `+user.email+` `+textoVerificado+`</p>
@@ -74,12 +74,12 @@ firebase.auth().onAuthStateChanged(function (user) {
 });
 
 function enviar() {
-    var email = document.getElementById('email').value;
-    var pass = document.getElementById('pass').value;
+    let email = document.getElementById('email').value;
+    let pass = document.getElementById('pass').value;
     firebase.auth().createUserWithEmailAndPassword(email, pass).catch(function (error) {
         // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
+        let errorCode = error.code;
+        let errorMessage = error.message;
         alert(errorMessage);
     }).then(function () {
         verificar();
@@ -87,7 +87,7 @@ function enviar() {
 }
 
 function verificar() {
-    var user = firebase.auth().currentUser;
+    let user = firebase.auth().currentUser;
     user.sendEmailVerification().then(function () {
 
     }).catch(function (error) {
@@ -96,12 +96,12 @@ function verificar() {
 }
 
 function acceso() {
-    var emailA = document.getElementById('emailA').value;
-    var passA = document.getElementById('passA').value;
+    let emailA = document.getElementById('emailA').value;
+    let passA = document.getElementById('passA').value;
     firebase.auth().signInWithEmailAndPassword(emailA, passA).catch(function (error) {
         // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
+        let errorCode = error.code;
+        let errorMessage = error.message;
         alert(errorMessage);
         // ...
     });
@@ -166,15 +166,22 @@ const issIcon = L.icon({
 });
 let firsTime2 = true;
 let rutaTemp = "";
-let busmarker = L.marker([-90, 0], {
-    icon: issIcone
-}).addTo(mymap);
 
-var marcador = false;
+let marcador = false;
 
-function getData() {
-    var ruta = document.getElementById("ruta").value;
-    if (rutaTemp !== ruta) {
+
+
+let database = firebase.database();
+
+
+
+
+
+
+function iterador() {
+    let arr = [];
+    let ruta = document.getElementById("ruta").value;
+    /*if (rutaTemp !== ruta) {
         firsTime2 = true;
         if(marcador){
           console.log("yeah bitch");
@@ -183,27 +190,95 @@ function getData() {
              icon: issIcone
           }).addTo(mymap);
         }
+
         marcador = true;
     };
-    var rutaTemp = ruta;
-    var database = firebase.database();
-    var ref = database.ref('rutas/' + ruta);
-    ref.on('value', function (datos) {
-        var info = datos.val();
-        var keys = Object.keys(info);
-        k = keys[keys.length - 1];
-        var altitud = info[k].altitud;
-        var longitud = info[k].longitud;
-        var capacidad = info[k].capacidad;
-        busmarker.setLatLng([altitud, longitud]);
-        if (firsTime2) {
-          mymap.flyTo([altitud, longitud], 15);
-          firsTime2 = false;
-        };
-        const txt = '<p>Ruta: ' + ruta + '<br />Capacidad: ' + capacidad + '</p>';
-        busmarker.bindPopup(txt);
-    })
+
+    let rutaTemp = ruta;
+    */
+
+    let ref = database.ref('rutas/' + ruta);
+    ref.once('value', function (datos) {
+        let info = datos.val();
+        let keys = Object.keys(info);
+        //console.log(keys);
+        for(let j = 0; j< keys.length; j++){
+          let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
+            refe.once('value', function(datose){
+            let infoe = datose.val();
+            //let keyse = Object.keys(infoe);
+            //let k = keyse[keyse.length - 1];
+            let altitud = infoe.altitud;
+            let longitud = infoe.longitud;
+            let capacidad = infoe.capacidad;
+            const txt = '<p>Ruta: ' + keys[j] + '<br />Capacidad: ' + capacidad + '</p>';
+            //arr.push(L.marker([altitud, longitud]));
+            arr.push(L.marker([altitud, longitud], {
+                icon: issIcone
+            }).addTo(mymap));
+            ;
+            arr[j].bindPopup(txt);
+          });
+        }
+    });
+    console.log(arr);
+      return arr;
+
 }
+
+
+
+
+function getData() {
+    let ruta = document.getElementById("ruta").value;
+    let arreglo=iterador();
+    //console.log(arreglo[0]);
+    /*if (rutaTemp !== ruta) {
+        firsTime2 = true;
+        if(marcador){
+          console.log("yeah bitch");
+          busmarker.remove();
+          busmarker = L.marker([-90, 0], {
+             icon: issIcone
+          }).addTo(mymap);
+        }
+
+        marcador = true;
+    };
+
+    let rutaTemp = ruta;
+
+    let ref = database.ref('rutas/' + ruta);
+    ref.on('value', function (datos) {
+        let info = datos.val();
+        let keys = Object.keys(info);
+        for(let j = 0; j< keys.length; j++){
+          let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
+            refe.on('value', function(datose){
+            let infoe = datose.val();
+            //let keyse = Object.keys(infoe);
+            //let k = keyse[keyse.length - 1];
+            let altitud = infoe.altitud;
+            let longitud = infoe.longitud;
+            let capacidad = infoe.capacidad;
+            const txt = '<p>Ruta: ' + keys[j] + '<br />Capacidad: ' + capacidad + '</p>';
+            arreglo[j].setLatLng([altitud, longitud]);
+            //arr[j].addTo(mymap)
+            //arr[j].bindPopup(txt);
+
+          })
+        }
+    })
+      */
+}
+
+
+
+
+
+
+
+//_______________________________________________________________________________
 
 
 let firsTime = true;
