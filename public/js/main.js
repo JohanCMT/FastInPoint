@@ -13,27 +13,7 @@ let firebaseConfig = {
 //--------------------------------------
 
 firebase.initializeApp(firebaseConfig);
-/* let database = firebase.database();
- let ref = database.ref('rutas/ruta1Directo');
-
- let data = {
-   altitud: 105,
-   longitud: 55,
-   capacidad: "alta"
- }
- ref.push(data);
-
- ref.on('value', gotData, errData);
-
- function gotData(data){
-   console.log(data.val());
- }
- function errData(err){
-   console.log('Error!');
-   console.log(err);
- }
- */
-
+//Se hace autentificación del usuario
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         let displayName = user.displayName;
@@ -67,6 +47,8 @@ firebase.auth().onAuthStateChanged(function (user) {
     }
 });
 
+
+//Se guarda al usuario con contraseña
 function enviar() {
     let email = document.getElementById('email').value;
     let pass = document.getElementById('pass').value;
@@ -79,7 +61,7 @@ function enviar() {
         verificar();
     });
 }
-
+//Se envía un correo de verificación
 function verificar() {
     let user = firebase.auth().currentUser;
     user.sendEmailVerification().then(function () {
@@ -89,6 +71,7 @@ function verificar() {
     });
 }
 
+//le permite al usuario logearse en la página
 function acceso() {
     let emailA = document.getElementById('emailA').value;
     let passA = document.getElementById('passA').value;
@@ -101,6 +84,8 @@ function acceso() {
     });
 }
 
+//Le permite al usuario salir de su sesión
+
 function cerrar() {
     firebase.auth().signOut()
         .then(function () {
@@ -110,6 +95,8 @@ function cerrar() {
             console.log(error)
         })
 }
+
+//Degine cuando enseñar la opción de registro o acceso
 $(document).ready(function () {
     $('#loginRegistro').change(function () {
         if ($(this).is(':checked')) {
@@ -124,18 +111,25 @@ $(document).ready(function () {
 
 //--------------------------------------
 
-// Initialize Firebase
+// Imagenes para usuario y camiones
 const issIcone = L.icon({
     iconUrl: 'Bus.png',
     iconSize: [60, 42],
     iconAnchor: [25, 16],
 });
 
+const issIcon = L.icon({
+    iconUrl: 'Ubi.png',
+    iconSize: [55, 36],
+    iconAnchor: [15, 8],
+});
+
+
 
 //--------------------------------------
 
 
-//map and Title
+//Agrega un mapa y titles de leaflet
 const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributos';
 const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const tiles = L.tileLayer(tileUrl, {
@@ -148,45 +142,22 @@ const mymap = L.map('issMap', {
 });
 
 tiles.addTo(mymap);
-
 mymap.setView([25.749247, -100.299161], 9);
 
-//Marker with icon
+//--------------------------------------
 
-const issIcon = L.icon({
-    iconUrl: 'Ubi.png',
-    iconSize: [55, 36],
-    iconAnchor: [15, 8],
-});
+
+//Se definen variable de apoyos y se llama la base de datos
 let firsTime2 = true;
 let rutaTemp = "";
-
 let marcador = false;
-
-
-
 let database = firebase.database();
 
-
+//Se crean los marcadores para cada camión de la ruta defina por el usuario
 async function iterador() {
     let arr = [];
     let ruta = document.getElementById("ruta").value;
     if (ruta === '') return;
-    /*if (rutaTemp !== ruta) {
-        firsTime2 = true;
-        if(marcador){
-          console.log("yeah bitch");
-          busmarker.remove();
-          busmarker = L.marker([-90, 0], {
-             icon: issIcone
-          }).addTo(mymap);
-        }
-
-        marcador = true;
-    };
-
-    let rutaTemp = ruta;
-    */
     let ref = database.ref('rutas/' + ruta);
     let idx = 1;
     let prom = await ref.once('value');
@@ -213,21 +184,16 @@ async function iterador() {
 }
 
 
-
+//Se utilizan los marcadores y se actualizan según su cambio de posición
 let prev = [];
 async function getData()  {
     let ruta = document.getElementById("ruta").value;
     let [arreglo, llaves] = await iterador();
-    console.log(arreglo);
-
-    console.log(llaves);
     for(let itera=0; itera<arreglo.length; itera++){
 
             let refi = database.ref('rutas/' + ruta + '/' + llaves[itera]);
             await refi.on('value', function(infoi){
             respi = infoi.val();
-            console.log(infoi);
-            console.log(respi);
             let altitud = respi.altitud;
             let longitud = respi.longitud;
             let capacidad = respi.capacidad;
@@ -238,45 +204,42 @@ async function getData()  {
 
     }
 
+    //Inicialmente se coloca la vista en el primer camión
 
     if (prev.length === 0 && arreglo.length !== 0) {
         mymap.setView(arreglo[0].getLatLng(), 15);
     }
 
-
+    //Se borra el registro anterior  del marcador del mapa y se guarda el nuevo
 
     for (item of prev) {
-        mymap.removeLayer(item);
+      mymap.removeLayer(item);
     }
+
     prev = [];
+
     for (let i = 0; i < arreglo.length; i++) {
         let mark = arreglo[i];
         prev.push(mark);
     }
 
+
 }
 
-// setInterval(getData, 1000);
+//--------------------------------------
 
-
-
-
-
-//_______________________________________________________________________________
-
-
+//Se crea el marcador del usuario
 let firsTime = true;
 const marker = L.marker([0, 0], {
     icon: issIcon
 }).addTo(mymap);
 
+//Se obtiene la posición del usuario y se define su marcador
 async function getU() {
     console.log("geolocation is available ");
     navigator.geolocation.getCurrentPosition(position => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-        //document.getElementById('lat').textContent = latitude;
-        //document.getElementById('long').textContent = longitude;
         marker.setLatLng([latitude, longitude]);
         if (firsTime) {
             mymap.setView([latitude, longitude], 15);
@@ -284,8 +247,6 @@ async function getU() {
         }
     });
 
-    //  L.marker([latitude, longitude]).addTo(mymap);
-
-
 }
+//Se llama la función para que se ejecute apenas inicie la página
 getU();
