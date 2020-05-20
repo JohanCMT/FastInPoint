@@ -49,11 +49,6 @@ firebase.auth().onAuthStateChanged(function (user) {
             textoVerificado = "Email verificado";
         }
         let providerData = user.providerData;
-        /*
-        document.getElementById('login').innerHTML=
-        `<p>Logueado `+user.email+` `+textoVerificado+`</p>
-        <button type="button" class="btn btn-danger" onclick="cerrar()">Cerrar sesión</button>
-        `;*/
         document.getElementById('botonAcceso').style.display = "none";
         document.getElementById('checkLogin').style.display = "none";
         document.getElementById('areaRegistro').style.display = "none";
@@ -61,7 +56,6 @@ firebase.auth().onAuthStateChanged(function (user) {
         document.getElementById('areaLogin').style.display = "";
         document.getElementById('btnCerrar').style.display = "";
         document.getElementById('emailA').value = email;
-        console.log(user);
     } else {
         //  document.getElementById('login').innerHTML="No Logueado ";
         document.getElementById('botonAcceso').style.display = "";
@@ -206,7 +200,7 @@ async function iterador() {
         let altitud = infoe.altitud;
         let longitud = infoe.longitud;
         let capacidad = infoe.capacidad;
-        const txt = '<p>Ruta: ' + idx + '<br />Capacidad: ' + capacidad + '</p>';
+        const txt = '<p>Ruta: ' + keys[j] + '<br />Capacidad: ' + capacidad + '</p>';
         let newMarker = L.marker([altitud, longitud], {
             icon: issIcone
         }).addTo(mymap);
@@ -214,7 +208,7 @@ async function iterador() {
         arr.push(newMarker);
     }
 
-    return arr;
+    return [arr,keys];
 
 }
 
@@ -223,11 +217,34 @@ async function iterador() {
 let prev = [];
 async function getData()  {
     let ruta = document.getElementById("ruta").value;
-    let arreglo = await iterador();
+    let [arreglo, llaves] = await iterador();
+    console.log(arreglo);
+
+    console.log(llaves);
+    for(let itera=0; itera<arreglo.length; itera++){
+
+            let refi = database.ref('rutas/' + ruta + '/' + llaves[itera]);
+            await refi.on('value', function(infoi){
+            respi = infoi.val();
+            console.log(infoi);
+            console.log(respi);
+            let altitud = respi.altitud;
+            let longitud = respi.longitud;
+            let capacidad = respi.capacidad;
+            const txt = '<p>Ruta: ' + llaves[itera] + '<br />Capacidad: ' + capacidad + '</p>';
+            arreglo[itera].setLatLng([altitud, longitud]);
+            arreglo[itera].bindPopup(txt);
+          });
+
+    }
+
 
     if (prev.length === 0 && arreglo.length !== 0) {
         mymap.setView(arreglo[0].getLatLng(), 15);
     }
+
+
+
     for (item of prev) {
         mymap.removeLayer(item);
     }
@@ -236,47 +253,7 @@ async function getData()  {
         let mark = arreglo[i];
         prev.push(mark);
     }
-    setTimeout(getData, 500);
 
-
-    //console.log(arreglo[0]);
-    /*if (rutaTemp !== ruta) {
-        firsTime2 = true;
-        if(marcador){
-          console.log("yeah bitch");
-          busmarker.remove();
-          busmarker = L.marker([-90, 0], {
-             icon: issIcone
-          }).addTo(mymap);
-        }
-
-        marcador = true;
-    };
-
-    let rutaTemp = ruta;
-
-    let ref = database.ref('rutas/' + ruta);
-    ref.on('value', function (datos) {
-        let info = datos.val();
-        let keys = Object.keys(info);
-        for(let j = 0; j< keys.length; j++){
-          let refe = database.ref('rutas/' + ruta + '/' + keys[j] );
-            refe.on('value', function(datose){
-            let infoe = datose.val();
-            //let keyse = Object.keys(infoe);
-            //let k = keyse[keyse.length - 1];
-            let altitud = infoe.altitud;
-            let longitud = infoe.longitud;
-            let capacidad = infoe.capacidad;
-            const txt = '<p>Ruta: ' + keys[j] + '<br />Capacidad: ' + capacidad + '</p>';
-            arreglo[j].setLatLng([altitud, longitud]);
-            //arr[j].addTo(mymap)
-            //arr[j].bindPopup(txt);
-
-          })
-        }
-    })
-      */
 }
 
 // setInterval(getData, 1000);
@@ -306,8 +283,6 @@ async function getU() {
             firsTime = false;
         }
     });
-
-    getData();
 
     //  L.marker([latitude, longitude]).addTo(mymap);
 
